@@ -127,7 +127,17 @@ function applyView(): void {
   refreshModeButtons();
   refreshSyncButton();
   refreshFormatButtons();
-  if (editor) editor.layout();
+  // Force Monaco to lay out after the className change is committed by the
+  // browser. The synchronous editor.layout() runs before reflow, so it reads
+  // stale 0×0 dimensions when transitioning from a mode where source-pane
+  // was display:none — the editor stays blank until something else triggers
+  // a relayout. Re-layout across rAF + a delayed setTimeout to also catch
+  // cases where the first frame still hasn't applied the new size.
+  if (editor) {
+    editor.layout();
+    requestAnimationFrame(() => editor?.layout());
+    setTimeout(() => editor?.layout(), 60);
+  }
 }
 
 function refreshModeButtons(): void {
@@ -363,6 +373,13 @@ function setupEditor(text: string, languageId: string): void {
   editor.layout();
   setTimeout(() => editor?.layout(), 0);
   requestAnimationFrame(() => editor?.layout());
+  // Belt-and-suspenders: Monaco's automaticLayout uses ResizeObserver but
+  // doesn't always fire correctly on the display:none → visible transition
+  // (the default mode is preview, so the source pane is hidden when the
+  // editor is created). Watch the source-pane explicitly and force layout
+  // on every size change so switching to source mode actually paints.
+  const paneObserver = new ResizeObserver(() => editor?.layout());
+  paneObserver.observe(sourcePane);
   // Fallback: if the model came up empty for any reason, write the text we
   // received in the init message back into it.
   if (text && model.getValue().length === 0) {
