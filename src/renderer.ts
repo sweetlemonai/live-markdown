@@ -59,7 +59,7 @@ export function setThemeAssetRoot(root: string): void {
 async function loadExtraThemes(hl: Highlighter): Promise<void> {
   if (extraThemesLoaded) return;
   if (!themeAssetRoot) {
-    console.warn('[live-markdown] themeAssetRoot not set; skipping custom theme load');
+    console.warn('[sweet-markdown] themeAssetRoot not set; skipping custom theme load');
     return;
   }
   extraThemesLoaded = true;
@@ -76,7 +76,7 @@ async function loadExtraThemes(hl: Highlighter): Promise<void> {
       await hl.loadTheme(json);
       extraThemes.push({ id: v.id, label: v.label, type: v.type });
     } catch (e) {
-      console.error('[live-markdown] failed to load custom theme', v.file, '→', (e as Error).message);
+      console.error('[sweet-markdown] failed to load custom theme', v.file, '→', (e as Error).message);
     }
   }
 }

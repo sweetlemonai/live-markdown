@@ -557,7 +557,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const ws = vscode.workspace.getWorkspaceFolder(entry.document.uri);
     if (!ws) {
       void vscode.window.showWarningMessage(
-        'Live Markdown: open a workspace folder to paste/drop images.',
+        'Sweet Markdown: open a workspace folder to paste/drop images.',
       );
       return;
     }

@@ -1,6 +1,6 @@
 {
-  "name": "live-markdown",
-  "displayName": "Live Markdown",
+  "name": "sweet-markdown",
+  "displayName": "Sweet Markdown",
   "description": "Toggle individual markdown tabs between source and rendered preview, in place. Each tab is independent.",
   "version": "1.0.0",
   "publisher": "sweet-lemon",
@@ -8,12 +8,12 @@
   "icon": "images/logo.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sweetlemonai/live-markdown.git"
+    "url": "https://github.com/sweetlemonai/sweet-markdown.git"
   },
   "bugs": {
-    "url": "https://github.com/sweetlemonai/live-markdown/issues"
+    "url": "https://github.com/sweetlemonai/sweet-markdown/issues"
   },
-  "homepage": "https://github.com/sweetlemonai/live-markdown#readme",
+  "homepage": "https://github.com/sweetlemonai/sweet-markdown#readme",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -55,7 +55,7 @@
     "customEditors": [
       {
         "viewType": "liveMarkdown.editor",
-        "displayName": "Live Markdown",
+        "displayName": "Sweet Markdown",
         "selector": [
           {
             "filenamePattern": "*.md"
@@ -71,47 +71,47 @@
       {
         "command": "liveMarkdown.toggle",
         "title": "Markdown: Toggle Preview",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.revealHeading",
         "title": "Markdown: Reveal Heading",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.exportHtml",
         "title": "Markdown: Export to HTML",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.exportPdf",
         "title": "Markdown: Export to PDF",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.copyAsPlainText",
         "title": "Markdown: Copy as Plain Text",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.copyAsMarkdown",
         "title": "Markdown: Copy as Markdown",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.copyAsHtml",
         "title": "Markdown: Copy as HTML",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.openThemeTab",
         "title": "Markdown: Open Theme Tab",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       },
       {
         "command": "liveMarkdown.openSettings",
         "title": "Markdown: Open Settings",
-        "category": "Live Markdown"
+        "category": "Sweet Markdown"
       }
     ],
     "keybindings": [
@@ -170,7 +170,7 @@
       ]
     },
     "configuration": {
-      "title": "Live Markdown",
+      "title": "Sweet Markdown",
       "properties": {
         "liveMarkdown.sourceTheme": {
           "type": "string",

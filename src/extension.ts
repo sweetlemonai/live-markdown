@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }, context.workspaceState);
     }),
     vscode.commands.registerCommand('liveMarkdown.openSettings', () => {
-      void vscode.commands.executeCommand('workbench.action.openSettings', '@ext:sweet-lemon.live-markdown');
+      void vscode.commands.executeCommand('workbench.action.openSettings', '@ext:sweet-lemon.sweet-markdown');
     }),
   );
 

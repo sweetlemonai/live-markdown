@@ -3,7 +3,7 @@ title: Test document
 author: Step 3 sample
 ---
 
-# Live Markdown — Render Test
+# Sweet Markdown — Render Test
 
 This file exercises the renderer for step 3. The YAML front matter above should be hidden.
 

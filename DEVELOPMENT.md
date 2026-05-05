@@ -1,4 +1,4 @@
-# Live Markdown — development notes
+# Sweet Markdown — development notes
 
 This file is for contributors. End-user docs are in [README.md](README.md).
 
@@ -77,7 +77,7 @@ The current shape — **Custom Editor with a single webview that owns both Monac
 - Selection / cursor / decorations are not visible to the rest of VS Code.
 - Find Widget integration: we use VS Code's webview Find Widget for the rendered pane (`enableFindWidget: true`) and Monaco's built-in Find for the source pane.
 
-The escape hatch for users who want all that: right-click the file in the explorer → **Reopen Editor With… → Text Editor**. That swaps in VS Code's native editor for that document, and they can switch back to Live Markdown the same way. (We're considering shipping a dedicated command for this — see "Open known limitations" below.)
+The escape hatch for users who want all that: right-click the file in the explorer → **Reopen Editor With… → Text Editor**. That swaps in VS Code's native editor for that document, and they can switch back to Sweet Markdown the same way. (We're considering shipping a dedicated command for this — see "Open known limitations" below.)
 
 ## Webview structure and message protocol
 
@@ -222,7 +222,7 @@ The formatting actions are intentionally Monaco-only — they don't go through t
 
 ## Known limitations users will hit
 
-- **Other markdown extensions don't run** against Live Markdown's source pane. Examples: Markdown All in One, Markdown Preview Github Styling, MPE. Their commands and decorations bind to VS Code's TextEditor; the custom editor's Monaco instance is a separate world. Users who need them should switch the file to **Reopen Editor With → Text Editor**.
+- **Other markdown extensions don't run** against Sweet Markdown's source pane. Examples: Markdown All in One, Markdown Preview Github Styling, MPE. Their commands and decorations bind to VS Code's TextEditor; the custom editor's Monaco instance is a separate world. Users who need them should switch the file to **Reopen Editor With → Text Editor**.
 - **Copilot / Codeium / other AI extensions** for the same reason — they hook the TextEditor, not Monaco-in-webview.
 - **Vim / VSCodeVim** also TextEditor-bound.
 - **Built-in markdown features** (Markdown: Open Preview, Markdown: Open Preview to the Side) still work, but they open VS Code's native preview, not ours. The `Cmd+Shift+V` keybinding is bound by both; we add `resourceExtname` to the `when` clause to take precedence on `.md` and `.markdown`.
@@ -265,7 +265,7 @@ The legacy three are kept for migration compatibility and currently feed the HTM
 1. Bump `version` in `package.json`.
 2. Add a section to `CHANGELOG.md` (keepachangelog.com format).
 3. `npm run package` to produce a `.vsix`.
-4. Verify the .vsix in a fresh window: `code --install-extension live-markdown-<version>.vsix`.
+4. Verify the .vsix in a fresh window: `code --install-extension sweet-markdown-<version>.vsix`.
 5. `vsce publish` (or upload via the marketplace UI).
 
 ## Contributing

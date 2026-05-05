@@ -1,24 +1,24 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/logo.png" alt="Live Markdown" width="128" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/logo.png" alt="Sweet Markdown" width="128" />
 </p>
 
-<h1 align="center">Live Markdown</h1>
+<h1 align="center">Sweet Markdown</h1>
 
 <p align="center">
   Source and rendered markdown side-by-side in a single tab — with themes, math, mermaid, and a real Monaco editor.
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/hero.png" alt="Live Markdown — split-mode hero" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/hero.png" alt="Sweet Markdown — split-mode hero" />
 </p>
 
 ---
 
 ## What this is
 
-Live Markdown is a custom editor for `.md` and `.markdown` files. One tab, four view modes — source only, preview only, split horizontal, split vertical — and you flip between them in place without VS Code closing and reopening anything. The source pane is a real Monaco editor; the preview is a styled markdown render with shiki syntax highlighting, KaTeX math, and Mermaid diagrams.
+Sweet Markdown is a custom editor for `.md` and `.markdown` files. One tab, four view modes — source only, preview only, split horizontal, split vertical — and you flip between them in place without VS Code closing and reopening anything. The source pane is a real Monaco editor; the preview is a styled markdown render with shiki syntax highlighting, KaTeX math, and Mermaid diagrams.
 
-The point: VS Code's built-in markdown preview is a *paired* tab — every preview consumes a slot, and switching back and forth is friction. Markdown Preview Enhanced has more features but a heavier UI, exporters that ship a headless browser, and pinball physics around theming. Live Markdown is the middle path: keep the tab count down, keep the editor fast, keep theming sane (dark/light for source / preview body / code blocks / mermaid all chosen separately), and ship without trying to be a wiki, a slide deck, or a Pandoc replacement.
+The point: VS Code's built-in markdown preview is a *paired* tab — every preview consumes a slot, and switching back and forth is friction. Markdown Preview Enhanced has more features but a heavier UI, exporters that ship a headless browser, and pinball physics around theming. Sweet Markdown is the middle path: keep the tab count down, keep the editor fast, keep theming sane (dark/light for source / preview body / code blocks / mermaid all chosen separately), and ship without trying to be a wiki, a slide deck, or a Pandoc replacement.
 
 ## What you get
 
@@ -64,14 +64,14 @@ The point: VS Code's built-in markdown preview is a *paired* tab — every previ
 
 ## Quick start
 
-1. Install the extension and open any `.md` or `.markdown` file. It opens in Live Markdown's preview by default.
+1. Install the extension and open any `.md` or `.markdown` file. It opens in Sweet Markdown's preview by default.
 2. Use the icons in the header to switch view modes, toggle the formatting toolbar, open the outline, or open the **Theme tab**.
 3. `⌘⇧V` (macOS) / `Ctrl+⇧V` (Windows / Linux) toggles between source and preview without leaving the tab.
 4. Run **Markdown: Open Theme Tab** from the command palette to manage themes — pick separately for dark and light, save globally or per file.
 
 ## What's not included
 
-This is deliberate. Live Markdown is a focused editor, not a knowledge base or a Pandoc front-end:
+This is deliberate. Sweet Markdown is a focused editor, not a knowledge base or a Pandoc front-end:
 
 - **No wikilinks, backlinks, or graph view.** Use Foam, Dendron, or Obsidian if that's your workflow.
 - **No collaborative editing.** Use Live Share.
@@ -80,31 +80,31 @@ This is deliberate. Live Markdown is a focused editor, not a knowledge base or a
 - **No PlantUML, Graphviz, or executable code blocks.** Mermaid only.
 - **No spell check.** It conflicted with typing in early versions and was removed.
 
-If you need any of those, [Markdown Preview Enhanced](https://github.com/shd101wyy/vscode-markdown-preview-enhanced) is the one to pair with. The extensions can coexist — Live Markdown only registers as the default editor for `.md` / `.markdown`, which you can override per file.
+If you need any of those, [Markdown Preview Enhanced](https://github.com/shd101wyy/vscode-markdown-preview-enhanced) is the one to pair with. The extensions can coexist — Sweet Markdown only registers as the default editor for `.md` / `.markdown`, which you can override per file.
 
 ## Screenshots
 
 **Theme tab** — pick source / preview / code / mermaid themes separately for dark and light, with a per-token color picker for fine-tuning.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/theme.png" alt="Theme tab" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/theme.png" alt="Theme tab" />
 </p>
 
 **Mermaid diagrams** — preset themes that match the editor theme so the diagram doesn't sit against an off-tone background.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/mermaid.png" alt="Mermaid diagram in matching theme" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/mermaid.png" alt="Mermaid diagram in matching theme" />
 </p>
 
 **KaTeX math** — inline `$...$` and block `$$...$$`, including matrices and aligned environments.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/math.png" alt="KaTeX math rendering" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/math.png" alt="KaTeX math rendering" />
 </p>
 
 ## Issues and feedback
 
-Bug reports and feature requests on GitHub: <https://github.com/sweetlemonai/live-markdown/issues>
+Bug reports and feature requests on GitHub: <https://github.com/sweetlemonai/sweet-markdown/issues>
 
 ## License
 
