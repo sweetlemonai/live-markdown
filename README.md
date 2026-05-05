@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <em>(Hero screenshot / GIF placeholder — drop a 16:9 capture of split mode here before publish.)</em>
+  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/hero.png" alt="Live Markdown — split-mode hero" />
 </p>
 
 ---
@@ -84,12 +84,23 @@ If you need any of those, [Markdown Preview Enhanced](https://github.com/shd101w
 
 ## Screenshots
 
-*(Add 3–4 captures before publish.)*
+**Theme tab** — pick source / preview / code / mermaid themes separately for dark and light, with a per-token color picker for fine-tuning.
 
-- `images/screenshot-split.png` — split mode with the formatting toolbar visible
-- `images/screenshot-theme-tab.png` — Theme tab showing dark mode picks
-- `images/screenshot-mermaid.png` — Mermaid diagram with a matching editor theme
-- `images/screenshot-math.png` — KaTeX block math + matrix
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/theme.png" alt="Theme tab" />
+</p>
+
+**Mermaid diagrams** — preset themes that match the editor theme so the diagram doesn't sit against an off-tone background.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/mermaid.png" alt="Mermaid diagram in matching theme" />
+</p>
+
+**KaTeX math** — inline `$...$` and block `$$...$$`, including matrices and aligned environments.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sweetlemonai/live-markdown/main/images/math.png" alt="KaTeX math rendering" />
+</p>
 
 ## Issues and feedback
 
