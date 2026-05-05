@@ -363,19 +363,16 @@ function loadMonaco(): Promise<void> {
 function setupEditor(text: string, languageId: string): void {
   const monaco = window.monaco;
   model = monaco.editor.createModel(text, languageId);
-  // Default mode is preview, so source-pane is display:none when this
-  // runs. Monaco-container reads 0×0 from the DOM — and Monaco's view
-  // subsystem, once initialized against 0×0, never fully paints content
-  // even after editor.layout() is called when the pane becomes visible.
-  // Pass an explicit dimension from #content (always sized — it's a flex
-  // child of the body's main column) so Monaco's initial render uses real
-  // numbers regardless of source-pane visibility. Falls back to the
-  // viewport in the unlikely case #content is also 0×0.
-  const rect = contentDiv.getBoundingClientRect();
-  const initialDimension = {
-    width: rect.width || window.innerWidth || 800,
-    height: rect.height || window.innerHeight || 600,
-  };
+  // Monaco's view subsystem doesn't recover well from being created
+  // against a 0×0 container. To guarantee real dimensions at create time,
+  // force #content into mode-source for this synchronous block — that
+  // makes #source-pane visible (display:flex, full size) so the
+  // monaco-container measures correctly. The loading overlay is on top
+  // during this entire stretch, so the user never sees the mode flicker.
+  // applyView() (called right after this in the init handler) restores
+  // the correct mode className.
+  const previousClassName = contentDiv.className;
+  contentDiv.className = 'mode-source';
   editor = monaco.editor.create(monacoContainer, {
     model,
     theme: defineVSCodeTheme(),
@@ -389,8 +386,8 @@ function setupEditor(text: string, languageId: string): void {
     smoothScrolling: true,
     cursorBlinking: 'smooth',
     bracketPairColorization: { enabled: true },
-    dimension: initialDimension,
   });
+  contentDiv.className = previousClassName;
   // Force a layout immediately and again on the next frame in case the
   // container started 0-sized while VS Code was finalizing the panel.
   // Without this, the very first open from clicking a .md file in the
