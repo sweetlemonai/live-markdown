@@ -2,6 +2,23 @@
 
 All notable changes to **Sweet Markdown** are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] — 2026-05-05
+
+### Fixed
+
+- **Blank preview on first open.** The renderer awaited the on-disk load of all 11 Noctis theme JSONs before the first markdown render could complete, so the very first preview after activation could sit blank for a noticeable beat. The hot path now resolves as soon as the bundled shiki themes are ready; Noctis loads in the background and any panel using a Noctis variant re-renders automatically once it finishes.
+- **Blank source pane on first open / when switching modes during loading.** Monaco was being created against `#monaco-container` while `#source-pane` was `display: none` (preview is the default mode), reading 0×0 dimensions. Once Monaco's view subsystem initialized at 0×0 it never fully painted content even after `editor.layout()` calls. `setupEditor` now temporarily forces `#content` into `mode-source` for the synchronous `monaco.editor.create` call so the container measures correctly, then restores the previous mode immediately. The user never sees the flicker because the loading overlay is on top throughout.
+- **Spurious 403 console errors for missing images.** Markdown referencing an image file that doesn't exist on disk left the relative `src` intact, which the webview tried to fetch against its own origin (`vscode-webview://<hash>/<src>`) and got 403. Missing-file `<img>` tags are now replaced with a styled `<span class="md-img-missing">` placeholder — no fetch, no console noise, and a visible cue in the preview.
+- **Mode-switch race with the loading overlay.** Switching to source while the preview was still rendering left the overlay covering the source pane, making it look empty. Overlay now drops instantly (no fade) on any user-driven mode switch.
+
+### Added
+
+- **Loading overlay.** Small spinner + "Loading editor…" label centered over the content area on first open. Hidden the moment first paint arrives (editor created in source mode, or first rendered HTML in preview/split modes), or as soon as the user clicks a mode button.
+
+### Changed
+
+- **Faster cold activation.** The 11 Noctis theme JSON reads now run in parallel via `Promise.all` instead of sequentially. Only `shiki.loadTheme` registration stays sequential to keep shiki's registry mutations safe.
+
 ## [1.0.0] — 2026-05-04
 
 First marketplace release.
