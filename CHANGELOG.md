@@ -42,7 +42,3 @@ First marketplace release.
 
 - The custom editor is the default for `.md` and `.markdown`. Switch back to VS Code's native text editor for any individual file via right-click → **Reopen Editor With… → Text Editor** (useful for Copilot, Vim, and other extensions that bind to the underlying TextEditor rather than Monaco-in-webview).
 - `Cmd+Shift+V` / `Ctrl+Shift+V` toggles between source and preview. The keybinding scopes itself to `.md` / `.markdown` files so it doesn't conflict with the built-in markdown preview's binding on other languages.
-
-## [0.1.0] — initial prototype
-
-Unpublished. Toggle command, status-bar item, default keybinding, basic markdown-it + shiki rendering. Released as **Single Tab Markdown** under the `purple-vision.markdown-toggle` ID — all of that is superseded by 1.0.0 above.

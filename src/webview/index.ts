@@ -97,10 +97,7 @@ const loadingOverlay = document.getElementById('loading-overlay') as HTMLDivElem
 function hideLoadingOverlay(): void {
   if (!loadingOverlay || loadingOverlay.classList.contains('hidden')) return;
   loadingOverlay.classList.add('hidden');
-  // Remove from the DOM after the fade so the overlay stops intercepting
-  // hit testing (it's pointer-events:none anyway, but the element is dead
-  // weight) and stops contributing to reflow on subsequent renders.
-  setTimeout(() => loadingOverlay.remove(), 220);
+  loadingOverlay.remove();
 }
 const dividerEl = document.getElementById('divider') as HTMLDivElement;
 const monacoContainer = document.getElementById('monaco-container') as HTMLDivElement;
@@ -178,6 +175,11 @@ function setMode(next: Mode): void {
   if (next === 'source' || next === 'split-horizontal' || next === 'split-vertical') {
     editor?.focus();
   }
+  // User explicitly switched modes — they expect content immediately. If
+  // the loading overlay is still up (e.g. preview render hasn't completed
+  // and they switched to source), drop it now so it doesn't sit on top of
+  // the source pane and look like an empty editor.
+  hideLoadingOverlay();
 }
 
 for (const b of modeBtns) {
@@ -396,9 +398,9 @@ function setupEditor(text: string, languageId: string): void {
     suppressNextEditEvent = true;
     model.setValue(text);
   }
-  // The editor is up. In source mode this is first paint; hide the overlay.
-  // In preview/split modes the renderedHtml handler will hide it instead
-  // (whichever fires first wins via the .hidden guard in hideLoadingOverlay).
+  // The editor is up — for source mode this is first paint and the overlay
+  // can come down now. For preview/split modes we keep the overlay until
+  // renderedHtml so the user doesn't see a flash of empty preview pane.
   if (view.mode === 'source') hideLoadingOverlay();
 
   model.onDidChangeContent(() => {

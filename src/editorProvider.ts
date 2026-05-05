@@ -905,10 +905,10 @@ body[data-second-row="formatting"] #format-row { display: flex; }
   position: relative;
 }
 
-/* First-load overlay: visible until either Monaco's editor is created
-   (source mode) or the first rendered HTML message arrives (preview /
-   split). Covers the source pane's bootstrap delay (Monaco AMD load) and
-   the first markdown render together. JS removes it on first paint. */
+/* First-load overlay: covers the content area until first paint. JS hides
+   it instantly via display:none — no fade, because the same background
+   color as the editor would otherwise make a fading overlay look like an
+   empty source pane while the source pane is actually working. */
 #loading-overlay {
   position: absolute;
   inset: 0;
@@ -921,9 +921,8 @@ body[data-second-row="formatting"] #format-row { display: flex; }
   background: var(--vscode-editor-background, var(--mt-theme-bg));
   color: var(--vscode-foreground, var(--mt-theme-fg));
   pointer-events: none;
-  transition: opacity 0.18s ease-out;
 }
-#loading-overlay.hidden { opacity: 0; }
+#loading-overlay.hidden { display: none; }
 #loading-overlay .loading-spinner {
   width: 22px; height: 22px;
   border: 2px solid currentColor;
