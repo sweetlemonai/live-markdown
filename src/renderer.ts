@@ -75,16 +75,41 @@ async function loadExtraThemes(hl: Highlighter): Promise<void> {
   const fs = require('fs') as typeof import('fs');
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const pathMod = require('path') as typeof import('path');
-  for (const v of NOCTIS_VARIANTS) {
+  // Read + parse all theme JSONs in parallel; the I/O is the slow part.
+  // hl.loadTheme stays sequential so shiki's registry mutations don't race.
+  const reads = await Promise.all(
+    NOCTIS_VARIANTS.map(async (v) => {
+      try {
+        const raw = await fs.promises.readFile(
+          pathMod.join(themeAssetRoot!, v.file),
+          'utf-8',
+        );
+        const json = JSON.parse(raw);
+        json.name = v.id;
+        return { v, json } as const;
+      } catch (e) {
+        console.error(
+          '[sweet-markdown] failed to read custom theme',
+          v.file,
+          '→',
+          (e as Error).message,
+        );
+        return null;
+      }
+    }),
+  );
+  for (const r of reads) {
+    if (!r) continue;
     try {
-      const filePath = pathMod.join(themeAssetRoot, v.file);
-      const raw = await fs.promises.readFile(filePath, 'utf-8');
-      const json = JSON.parse(raw);
-      json.name = v.id;
-      await hl.loadTheme(json);
-      extraThemes.push({ id: v.id, label: v.label, type: v.type });
+      await hl.loadTheme(r.json);
+      extraThemes.push({ id: r.v.id, label: r.v.label, type: r.v.type });
     } catch (e) {
-      console.error('[sweet-markdown] failed to load custom theme', v.file, '→', (e as Error).message);
+      console.error(
+        '[sweet-markdown] failed to register custom theme',
+        r.v.file,
+        '→',
+        (e as Error).message,
+      );
     }
   }
 }

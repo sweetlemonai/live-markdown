@@ -673,6 +673,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   ${formatToolbarHtml()}
 </div>
 <div id="content" class="mode-${entry.mode}">
+  <div id="loading-overlay" aria-hidden="true">
+    <div class="loading-spinner"></div>
+    <div class="loading-label">Loading editor…</div>
+  </div>
   <div id="source-pane">
     <div id="monaco-container"></div>
   </div>
@@ -898,7 +902,38 @@ body[data-second-row="formatting"] #format-row { display: flex; }
   display: flex;
   min-height: 0;
   min-width: 0;
+  position: relative;
 }
+
+/* First-load overlay: visible until either Monaco's editor is created
+   (source mode) or the first rendered HTML message arrives (preview /
+   split). Covers the source pane's bootstrap delay (Monaco AMD load) and
+   the first markdown render together. JS removes it on first paint. */
+#loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7em;
+  background: var(--vscode-editor-background, var(--mt-theme-bg));
+  color: var(--vscode-foreground, var(--mt-theme-fg));
+  pointer-events: none;
+  transition: opacity 0.18s ease-out;
+}
+#loading-overlay.hidden { opacity: 0; }
+#loading-overlay .loading-spinner {
+  width: 22px; height: 22px;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  opacity: 0.55;
+  animation: mt-spin 0.9s linear infinite;
+}
+#loading-overlay .loading-label { font-size: 0.85em; opacity: 0.7; }
+@keyframes mt-spin { to { transform: rotate(360deg); } }
 #content.mode-split-horizontal { flex-direction: row; }
 #content.mode-split-vertical { flex-direction: column; }
 #content.mode-source { flex-direction: row; }
@@ -1167,6 +1202,19 @@ body[data-second-row="formatting"] #format-row { display: flex; }
 #rendered-content del, #rendered-content s { color: var(--mt-pv-strike, var(--mt-pt-strikethrough, inherit)); }
 #rendered-content mark { background: var(--mt-pv-mark-bg, var(--mt-pt-mark-bg, #fff8c5)); color: inherit; }
 #rendered-content img { max-width: 100%; }
+/* Inline placeholder for images whose file can't be found on disk. Avoids
+   the 403 the webview would otherwise log when fetching the relative
+   src against its own origin. */
+.md-img-missing {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border: 1px dashed var(--vscode-editorWidget-border, var(--vscode-panel-border, currentColor));
+  border-radius: 3px;
+  color: var(--vscode-descriptionForeground, currentColor);
+  font-family: var(--vscode-editor-font-family);
+  font-size: 0.85em;
+  opacity: 0.7;
+}
 #rendered-content ul.contains-task-list { list-style: none; padding-left: 1em; }
 #rendered-content input[type="checkbox"] { margin-right: 0.5em; }
 .md-error { color: var(--vscode-errorForeground); font-style: italic; }
@@ -1316,17 +1364,34 @@ function rewriteImageUrls(
   webview: vscode.Webview,
 ): string {
   const docDir = path.dirname(doc.uri.fsPath);
-  return html.replace(/<img\s+([^>]*?)src="([^"]+)"/gi, (match, attrs: string, src: string) => {
+  // Match the full <img …> tag so we can either rewrite the src or replace
+  // the whole element with a placeholder when the file is missing.
+  return html.replace(/<img\s+([^>]*?)\/?>/gi, (match, attrs: string) => {
+    const srcMatch = /(?:^|\s)src="([^"]*)"/i.exec(attrs);
+    if (!srcMatch) return match;
+    const src = srcMatch[1];
     if (/^(https?:|data:|blob:|vscode-webview:)/i.test(src)) return match;
     let absPath = src;
-    if (!path.isAbsolute(absPath)) absPath = path.resolve(docDir, decodeURI(src));
-    try {
-      if (!fs.existsSync(absPath)) return match;
-    } catch {
-      return match;
+    if (!path.isAbsolute(absPath)) {
+      try {
+        absPath = path.resolve(docDir, decodeURI(src));
+      } catch {
+        absPath = path.resolve(docDir, src);
+      }
+    }
+    let exists = false;
+    try { exists = fs.existsSync(absPath); } catch { exists = false; }
+    if (!exists) {
+      // Don't emit an <img> with a relative src: the webview would fetch
+      // it against its own origin (vscode-webview://<hash>/<src>) and the
+      // browser logs a 403 for every missing file. A placeholder span has
+      // no network request and gives the user a visible cue.
+      const safe = escapeHtml(src);
+      return `<span class="md-img-missing" title="Image not found: ${safe}">image not found: ${safe}</span>`;
     }
     const webviewSrc = webview.asWebviewUri(vscode.Uri.file(absPath)).toString();
-    return `<img ${attrs}src="${webviewSrc}"`;
+    const rebuilt = attrs.replace(/(?:^|\s)src="[^"]*"/i, ` src="${webviewSrc}"`);
+    return `<img ${rebuilt.trim()}>`;
   });
 }
 

@@ -92,6 +92,16 @@ const contentDiv = document.getElementById('content') as HTMLDivElement;
 const sourcePane = document.getElementById('source-pane') as HTMLDivElement;
 const renderedPane = document.getElementById('rendered-pane') as HTMLDivElement;
 const renderedScroll = document.getElementById('rendered-scroll') as HTMLDivElement;
+const loadingOverlay = document.getElementById('loading-overlay') as HTMLDivElement | null;
+
+function hideLoadingOverlay(): void {
+  if (!loadingOverlay || loadingOverlay.classList.contains('hidden')) return;
+  loadingOverlay.classList.add('hidden');
+  // Remove from the DOM after the fade so the overlay stops intercepting
+  // hit testing (it's pointer-events:none anyway, but the element is dead
+  // weight) and stops contributing to reflow on subsequent renders.
+  setTimeout(() => loadingOverlay.remove(), 220);
+}
 const dividerEl = document.getElementById('divider') as HTMLDivElement;
 const monacoContainer = document.getElementById('monaco-container') as HTMLDivElement;
 const renderedContent = document.getElementById('rendered-content') as HTMLDivElement;
@@ -386,6 +396,10 @@ function setupEditor(text: string, languageId: string): void {
     suppressNextEditEvent = true;
     model.setValue(text);
   }
+  // The editor is up. In source mode this is first paint; hide the overlay.
+  // In preview/split modes the renderedHtml handler will hide it instead
+  // (whichever fires first wins via the .hidden guard in hideLoadingOverlay).
+  if (view.mode === 'source') hideLoadingOverlay();
 
   model.onDidChangeContent(() => {
     if (suppressNextEditEvent) {
@@ -1252,6 +1266,7 @@ function handleMessage(msg: IncomingMessage): void {
       rebuildOutline();
       void renderMermaidBlocks(renderedContent);
       renderedScroll.scrollTop = scrollTop;
+      hideLoadingOverlay();
       break;
     }
     case 'themeChanged':
