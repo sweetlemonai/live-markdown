@@ -1,110 +1,89 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/logo.png" alt="Sweet Markdown" width="128" />
-</p>
-
 <h1 align="center">Sweet Markdown</h1>
 
 <p align="center">
-  Source and rendered markdown side-by-side in a single tab — with themes, math, mermaid, and a real Monaco editor.
+  Write and read markdown in the same tab. No more flipping panes.
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/hero.png" alt="Sweet Markdown — split-mode hero" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/hero.png" alt="Sweet Markdown" />
 </p>
 
 ---
 
-## What this is
+## Why
 
-Sweet Markdown is a custom editor for `.md` and `.markdown` files. One tab, four view modes — source only, preview only, split horizontal, split vertical — and you flip between them in place without VS Code closing and reopening anything. The source pane is a real Monaco editor; the preview is a styled markdown render with shiki syntax highlighting, KaTeX math, and Mermaid diagrams.
+Most markdown extensions split your screen into two: your file on one side, a preview on the other. Two windows for one document. Open another file and the whole layout shuffles.
 
-The point: VS Code's built-in markdown preview is a *paired* tab — every preview consumes a slot, and switching back and forth is friction. Markdown Preview Enhanced has more features but a heavier UI, exporters that ship a headless browser, and pinball physics around theming. Sweet Markdown is the middle path: keep the tab count down, keep the editor fast, keep theming sane (dark/light for source / preview body / code blocks / mermaid all chosen separately), and ship without trying to be a wiki, a slide deck, or a Pandoc replacement.
+Sweet Markdown puts everything in one tab. You see your markdown rendered. When you want to edit, switch the same tab to the source view. When you want both, split the tab. Each file remembers its own setup.
 
-## What you get
+That's it. That's the whole pitch.
 
-**Editing**
-- Monaco source editor with multi-cursor, undo/redo, find, syntax highlighting, soft-wrap on
-- 13-button formatting toolbar (Bold, Italic, Strikethrough, Inline code, Heading, Bulleted/Numbered/Task list, Block quote, Code block, Horizontal rule, Link, Image)
-- Smart toggle behaviour — clicking Bold on a wrapped word unwraps it
-- Keyboard shortcuts: `⌘B` bold, `⌘I` italic, `⌘E` inline code, `⌘K` link
-- Image paste from clipboard and drag-and-drop — saved to a workspace folder, link inserted at the cursor
+## What it does
 
-**Layout**
-- Four view modes (source / preview / split-horizontal / split-vertical) in one tab
-- Drag the divider in either split orientation
-- Sync scroll across split panes (toggleable)
-- Status bar word count and reading time
+**Four ways to view a file**, switchable from icons in the header: source only, rendered only, side-by-side, top-and-bottom. Each tab keeps its own setup.
 
-**Rendering**
-- CommonMark + GFM (tables, strikethrough, task lists, autolinks)
-- KaTeX math: `$inline$` and `$$block$$`, with errors styled inline so a typo doesn't tank the page
-- Mermaid diagrams (flowcharts, sequence, class, state, gantt, ER, pie — anything Mermaid supports)
-- Syntax-highlighted fenced code blocks via shiki
-- Heading anchors with hover-to-copy
-- Front-matter handling (hidden by default; show it as a styled box via setting)
-- Click a task list checkbox in the preview to toggle the source
+**Live preview while you type.** Updates as you go. No save-and-reload, no flipping panes.
 
-**Themes**
-- Independent theme picks for **source**, **preview body**, **code blocks**, and **mermaid**, separately for dark and light modes
-- 19 syntax themes including Noctis (11 variants), Dracula, Tokyo Night, Nord, One Dark Pro, Monokai, Solarized, Vitesse, GitHub
-- 25 mermaid theme presets that match the editor themes (no more "the diagram looks fine but doesn't fit my dark theme")
-- Per-token color customization (the theme tab opens a colour picker for every prose / syntax slot)
-- Per-file theme overrides — set this one document to Dracula without changing the global default
-- Live preview while you edit themes — broadcasts to all open markdown tabs
+**Sync scrolling.** When you scroll the source, the rendered side scrolls with it.
 
-**Find & navigation**
-- VS Code's native find widget inside the rendered pane (`⌘F`)
-- Outline tree in the Explorer sidebar
-- Slide-out outline panel inside the preview itself
+**A formatting toolbar** with the basics: bold, italic, headings, lists, links, images, code blocks. Toggle it on from the header icon. Keyboard shortcuts (⌘B, ⌘I, ⌘K) work whether the toolbar is visible or not.
 
-**Export**
-- Export to HTML — self-contained, CSS inlined, prefers-color-scheme aware
-- Export to PDF via the system print dialog (no bundled headless browser)
-- Copy as plain text, markdown, or HTML — selection-aware
+**Math equations** render inline with `$...$` and as blocks with `$$...$$`.
 
-## Quick start
+**Diagrams** with Mermaid: flowcharts, sequences, gantt charts, the lot. Just write a `mermaid` code block.
 
-1. Install the extension and open any `.md` or `.markdown` file. It opens in Sweet Markdown's preview by default.
-2. Use the icons in the header to switch view modes, toggle the formatting toolbar, open the outline, or open the **Theme tab**.
-3. `⌘⇧V` (macOS) / `Ctrl+⇧V` (Windows / Linux) toggles between source and preview without leaving the tab.
-4. Run **Markdown: Open Theme Tab** from the command palette to manage themes — pick separately for dark and light, save globally or per file.
+**Code blocks** get proper syntax colors, like in a real editor.
 
-## What's not included
+**Themes** for everything: source, preview, code, diagrams. Pick separately for light and dark mode. Plus per-file overrides if you want this one document to look different.
 
-This is deliberate. Sweet Markdown is a focused editor, not a knowledge base or a Pandoc front-end:
+**Outline view** of your headings, both in the sidebar and as a slide-out panel inside the preview.
 
-- **No wikilinks, backlinks, or graph view.** Use Foam, Dendron, or Obsidian if that's your workflow.
-- **No collaborative editing.** Use Live Share.
-- **No full Vim mode in the source editor.** Monaco itself supports it through extensions, but those extensions don't run inside the custom editor's Monaco instance. If you need Vim, switch the file to VS Code's text editor (right-click in the explorer → **Reopen Editor With… → Text Editor**).
-- **No Copilot autocompletion in the source pane.** Same reason — Copilot can't see Monaco running inside a webview. For AI-heavy editing sessions, use VS Code's text editor instead and switch back when you want the preview.
-- **No PlantUML, Graphviz, or executable code blocks.** Mermaid only.
-- **No spell check.** It conflicted with typing in early versions and was removed.
+**Drag images in or paste them from your clipboard.** They get saved to your workspace and linked at the cursor.
 
-If you need any of those, [Markdown Preview Enhanced](https://github.com/shd101wyy/vscode-markdown-preview-enhanced) is the one to pair with. The extensions can coexist — Sweet Markdown only registers as the default editor for `.md` / `.markdown`, which you can override per file.
+**Export** to HTML or PDF when you need to share.
+
+**Word count and reading time** in the status bar.
+
+## Try it
+
+Open any `.md` file. It'll show up rendered. Use the icons at the top to switch views, toggle the formatting toolbar, or open the theme tab.
+
+`⌘⇧V` (Mac) / `Ctrl+Shift+V` (Windows/Linux) flips between source and rendered without leaving the tab.
+
+## What it doesn't do
+
+This is on purpose. Sweet Markdown stays focused.
+
+- No wikilinks, no backlinks, no knowledge graph. If you want a second brain, use Obsidian or Dendron.
+- No live collaboration. Use Live Share.
+- No fancy export pipelines. HTML and PDF, that's it.
+- No PlantUML, no Graphviz. Just Mermaid.
+
+Some VS Code features that work in regular `.md` files won't work inside Sweet Markdown's editor: Vim mode, Copilot, spell-check extensions. If you need them for a particular file, right-click → **Reopen Editor With… → Text Editor** and you're back in VS Code's normal editor.
 
 ## Screenshots
 
-**Theme tab** — pick source / preview / code / mermaid themes separately for dark and light, with a per-token color picker for fine-tuning.
+**Theme tab.** Pick how source, preview, code, and diagrams look, separately for light and dark.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/theme.png" alt="Theme tab" />
 </p>
 
-**Mermaid diagrams** — preset themes that match the editor theme so the diagram doesn't sit against an off-tone background.
+**Mermaid diagrams** that match your theme.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/mermaid.png" alt="Mermaid diagram in matching theme" />
+  <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/mermaid.png" alt="Mermaid diagram" />
 </p>
 
-**KaTeX math** — inline `$...$` and block `$$...$$`, including matrices and aligned environments.
+**KaTeX math.** Inline `$...$` and block `$$...$$`, including matrices and aligned environments.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/sweetlemonai/sweet-markdown/main/images/math.png" alt="KaTeX math rendering" />
 </p>
 
-## Issues and feedback
+## Feedback
 
-Bug reports and feature requests on GitHub: <https://github.com/sweetlemonai/sweet-markdown/issues>
+Bug reports and feature requests on [GitHub](https://github.com/sweetlemonai/sweet-markdown/issues).
 
 ## License
 
