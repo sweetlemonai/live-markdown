@@ -14,17 +14,25 @@ import {
   type ThemeRegistration,
 } from 'shiki';
 
-// Cache the *promise*, not just the resolved highlighter, so two concurrent
-// callers share one createHighlighter() + loadExtraThemes() pass. Caching the
-// resolved value alone races: the second caller sees `highlighter` still
-// undefined during the first await, spawns a second instance, and the second
-// instance's loadExtraThemes() short-circuits on `extraThemesLoaded` — so the
-// cached highlighter ends up without the Noctis themes loaded.
+// Two cached promises so the hot path (getHighlighter) resolves as soon as
+// shiki's bundled themes are ready, while the slower disk-load of the 11
+// Noctis JSON files continues in the background. Without this split, the
+// very first preview render after activation blocks on noctis I/O — long
+// enough that the user sees a blank page on first open and assumes the
+// extension is broken.
+//
+// Concurrent callers must share one createHighlighter() + loadExtraThemes()
+// pass; caching the *resolved value* alone races (second caller sees
+// `highlighter` still undefined during the first await and spawns its own).
 //
 // `highlighter` is the resolved instance for the synchronous `highlight()`
-// callback used by markdown-it; it is assigned once the promise settles.
+// callback used by markdown-it; it is assigned once the bundled-themes
+// promise settles. Custom-theme registrations land on the same instance
+// later, so any panel that re-renders after noctis loading completes picks
+// them up automatically.
 let highlighter: Highlighter | undefined;
 let highlighterPromise: Promise<Highlighter> | undefined;
+let extraThemesPromise: Promise<void> | undefined;
 const loadedLangs = new Set<string>();
 
 /** Custom (non-shiki-bundled) themes loaded from dist/themes/*.json. */
@@ -86,12 +94,13 @@ export function getExtraThemes(): ReadonlyArray<CustomThemeInfo> {
 }
 
 /**
- * Eagerly create the highlighter (which triggers loadExtraThemes) so that
- * by the time the first panel resolves a theme, custom themes are loaded
- * into shiki's registry.
+ * Activation-time init: wait for both the bundled-themes highlighter AND
+ * the custom-theme load to finish, so the post-init notifyConfigChanged
+ * sees a fully-loaded registry. Panel hot paths only await getHighlighter().
  */
 export async function initRenderer(): Promise<void> {
   await getHighlighter();
+  await ensureExtraThemesLoaded();
 }
 
 export const SUPPORTED_THEMES: ReadonlyArray<{ id: BundledTheme; label: string }> = [
@@ -122,12 +131,27 @@ function getHighlighter(): Promise<Highlighter> {
         themes: PRELOAD_THEMES,
         langs: [],
       });
-      await loadExtraThemes(hl);
       highlighter = hl;
+      // Kick off the disk-loaded themes in the background; do NOT await.
+      // Panels can render with bundled themes immediately; if their selected
+      // theme is one of the noctis variants, it will appear unstyled (or
+      // fall back to default) until ensureExtraThemesLoaded resolves and
+      // notifyConfigChanged triggers a re-render.
+      void ensureExtraThemesLoaded();
       return hl;
     })();
   }
   return highlighterPromise;
+}
+
+function ensureExtraThemesLoaded(): Promise<void> {
+  if (!extraThemesPromise) {
+    extraThemesPromise = (async () => {
+      const hl = await getHighlighter();
+      await loadExtraThemes(hl);
+    })();
+  }
+  return extraThemesPromise;
 }
 
 function isLight(): boolean {
