@@ -1,0 +1,319 @@
+{
+  "name": "live-markdown",
+  "displayName": "Live Markdown",
+  "description": "Toggle individual markdown tabs between source and rendered preview, in place. Each tab is independent.",
+  "version": "1.0.0",
+  "publisher": "sweet-lemon",
+  "license": "MIT",
+  "icon": "images/logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sweetlemonai/live-markdown.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sweetlemonai/live-markdown/issues"
+  },
+  "homepage": "https://github.com/sweetlemonai/live-markdown#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "markdown",
+    "preview",
+    "editor",
+    "split",
+    "live",
+    "mermaid",
+    "katex",
+    "math",
+    "diagrams",
+    "toolbar",
+    "themes",
+    "monaco",
+    "formatting",
+    "syntax-highlighting"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "markdown",
+        "extensions": [
+          ".md",
+          ".markdown"
+        ],
+        "icon": {
+          "light": "images/md-file.svg",
+          "dark": "images/md-file.svg"
+        }
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "liveMarkdown.editor",
+        "displayName": "Live Markdown",
+        "selector": [
+          {
+            "filenamePattern": "*.md"
+          },
+          {
+            "filenamePattern": "*.markdown"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "commands": [
+      {
+        "command": "liveMarkdown.toggle",
+        "title": "Markdown: Toggle Preview",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.revealHeading",
+        "title": "Markdown: Reveal Heading",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.exportHtml",
+        "title": "Markdown: Export to HTML",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.exportPdf",
+        "title": "Markdown: Export to PDF",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.copyAsPlainText",
+        "title": "Markdown: Copy as Plain Text",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.copyAsMarkdown",
+        "title": "Markdown: Copy as Markdown",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.copyAsHtml",
+        "title": "Markdown: Copy as HTML",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.openThemeTab",
+        "title": "Markdown: Open Theme Tab",
+        "category": "Live Markdown"
+      },
+      {
+        "command": "liveMarkdown.openSettings",
+        "title": "Markdown: Open Settings",
+        "category": "Live Markdown"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "liveMarkdown.toggle",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "!notebookEditorFocused && editorLangId == markdown && resourceExtname == .md"
+      },
+      {
+        "command": "liveMarkdown.toggle",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "!notebookEditorFocused && editorLangId == markdown && resourceExtname == .markdown"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "liveMarkdown.toggle",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        },
+        {
+          "command": "liveMarkdown.revealHeading",
+          "when": "false"
+        },
+        {
+          "command": "liveMarkdown.exportHtml",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        },
+        {
+          "command": "liveMarkdown.exportPdf",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        },
+        {
+          "command": "liveMarkdown.copyAsPlainText",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        },
+        {
+          "command": "liveMarkdown.copyAsMarkdown",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        },
+        {
+          "command": "liveMarkdown.copyAsHtml",
+          "when": "resourceExtname == .md || resourceExtname == .markdown"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "liveMarkdown.outline",
+          "name": "Markdown Outline",
+          "when": "resourceExtname == .md || resourceExtname == .markdown || activeCustomEditorId == 'liveMarkdown.editor'"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Live Markdown",
+      "properties": {
+        "liveMarkdown.sourceTheme": {
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "github-dark",
+            "github-light",
+            "monokai",
+            "dracula",
+            "solarized-dark",
+            "solarized-light",
+            "nord",
+            "one-dark-pro",
+            "one-light",
+            "tokyo-night",
+            "vitesse-dark",
+            "vitesse-light",
+            "dark-plus",
+            "light-plus"
+          ],
+          "description": "Theme for the Monaco source editor. Empty string follows VS Code's active theme."
+        },
+        "liveMarkdown.previewTheme": {
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "github-dark",
+            "github-light",
+            "monokai",
+            "dracula",
+            "solarized-dark",
+            "solarized-light",
+            "nord",
+            "one-dark-pro",
+            "one-light",
+            "tokyo-night",
+            "vitesse-dark",
+            "vitesse-light",
+            "dark-plus",
+            "light-plus"
+          ],
+          "description": "Theme for the preview body (background, prose). Empty string follows VS Code's active theme."
+        },
+        "liveMarkdown.codeTheme": {
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "github-dark",
+            "github-light",
+            "monokai",
+            "dracula",
+            "solarized-dark",
+            "solarized-light",
+            "nord",
+            "one-dark-pro",
+            "one-light",
+            "tokyo-night",
+            "vitesse-dark",
+            "vitesse-light",
+            "dark-plus",
+            "light-plus"
+          ],
+          "description": "Theme for code blocks in the preview. Empty string follows VS Code's active theme."
+        },
+        "liveMarkdown.secondRow": {
+          "type": "string",
+          "default": "none",
+          "enum": [
+            "none",
+            "formatting"
+          ],
+          "enumDescriptions": [
+            "No second row",
+            "Show formatting toolbar"
+          ],
+          "description": "Which secondary control row is visible in the markdown editor header."
+        },
+        "liveMarkdown.showFrontMatter": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show YAML front matter as a styled block at the top of the rendered preview."
+        },
+        "liveMarkdown.showHeadingAnchors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a clickable '#' anchor on hover for each heading in the rendered preview."
+        },
+        "liveMarkdown.imagePasteFolder": {
+          "type": "string",
+          "default": "./assets",
+          "description": "Workspace-relative folder where pasted/dropped images are saved."
+        },
+        "liveMarkdown.themes": {
+          "type": "object",
+          "default": {},
+          "description": "Theme settings managed via the Theme tab. Keys: dark, light → source/preview/code/mermaid → { theme, overrides }. Use Markdown: Open Theme Tab from the command palette to edit.",
+          "additionalProperties": true
+        },
+        "liveMarkdown.readingWordsPerMinute": {
+          "type": "number",
+          "default": 250,
+          "minimum": 50,
+          "maximum": 1000,
+          "description": "Words per minute used to estimate reading time in the status bar."
+        },
+        "liveMarkdown.math.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Render math expressions ($inline$ and $$block$$) via KaTeX in the preview pane. Disable to leave dollar-sign syntax as plain text."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production && vsce package",
+    "lint": "eslint src --ext ts",
+    "vscode:prepublish": "node esbuild.js --production"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@vscode/vsce": "^2.24.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@vscode/codicons": "^0.0.45",
+    "@vscode/markdown-it-katex": "^1.1.2",
+    "katex": "^0.16.45",
+    "markdown-it": "^14.1.0",
+    "markdown-it-anchor": "^9.2.0",
+    "markdown-it-task-lists": "^2.1.1",
+    "mermaid": "^11.14.0",
+    "monaco-editor": "^0.55.1",
+    "shiki": "^1.10.0"
+  }
+}
