@@ -2,6 +2,12 @@
 
 All notable changes to **Sweet Markdown** are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] — 2026-05-07
+
+### Changed
+
+- **Empty documents open in source mode.** Opening a `.md` file whose contents are empty (or whitespace-only) now lands in the source pane with a cursor, instead of a blank preview. Non-empty documents still open in preview as before. Saved per-tab modes are unaffected.
+
 ## [1.0.2] — 2026-05-05
 
 ### Changed

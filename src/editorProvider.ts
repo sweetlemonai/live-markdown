@@ -257,15 +257,14 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       localResourceRoots: localRoots,
     };
 
-    // Entry's view fields are filled in below; for the initial HTML we just
-    // need its mode for the CSS class.
-    const tempEntryMode = DEFAULT_MODE;
-    panel.webview.html = this.buildHtml(panel.webview, monacoRoot, tempEntryMode);
+    // Empty docs open in source so the user lands on a cursor instead of a blank preview.
+    const initialMode: Mode = document.getText().trim() === '' ? 'source' : DEFAULT_MODE;
+    panel.webview.html = this.buildHtml(panel.webview, monacoRoot, initialMode);
 
     const entry: PanelEntry = {
       panel,
       document,
-      mode: DEFAULT_MODE,
+      mode: initialMode,
       dividerH: 50,
       dividerV: 50,
       syncScroll: true,
