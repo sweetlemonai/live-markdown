@@ -66,6 +66,13 @@ interface PanelEntry {
   lastAppliedText: string | null;
   disposables: vscode.Disposable[];
   renderTimer: ReturnType<typeof setTimeout> | undefined;
+  /**
+   * True once the webview has posted `'ready'`. Until then, theme/render
+   * pushes are suppressed — sending them before the webview's window-level
+   * `message` listener exists is what caused the cold-start "Loading editor…
+   * forever" race.
+   */
+  webviewReady: boolean;
 }
 
 // Used for the legacy overrides field that PanelEntry no longer carries — kept
@@ -189,6 +196,9 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
   notifyThemeChanged(): void {
     for (const entry of this.entries.values()) {
+      // Pre-ready entries pick up the latest theme via the init/themeUpdate
+      // pair sent from the 'ready' handler.
+      if (!entry.webviewReady) continue;
       entry.panel.webview.postMessage({ type: 'themeChanged' });
       // Auto mode: when no explicit user choice, the resolved theme follows
       // VS Code, so we need to push fresh Monaco theme data and re-render.
@@ -199,6 +209,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   notifySecondRowChanged(): void {
     const value = readSecondRow();
     for (const entry of this.entries.values()) {
+      if (!entry.webviewReady) continue;
       entry.panel.webview.postMessage({ type: 'secondRowChanged', value });
     }
   }
@@ -206,6 +217,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   notifyRenderSettingsChanged(): void {
     const settings = readRenderSettings();
     for (const entry of this.entries.values()) {
+      if (!entry.webviewReady) continue;
       entry.panel.webview.postMessage({ type: 'renderSettingsChanged', settings });
       if (entry.mode !== 'source') void this.pushRender(entry);
     }
@@ -271,6 +283,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       lastAppliedText: null,
       disposables: [],
       renderTimer: undefined,
+      webviewReady: false,
     };
     this.entries.set(panel, entry);
 
@@ -281,6 +294,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
 
     const docChangeDisposable = vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() !== document.uri.toString()) return;
+      // Before the webview signals ready, init hasn't been sent yet — and
+      // when it is sent (from the 'ready' handler), it'll carry the latest
+      // text. Posting docUpdate here would race the listener.
+      if (!entry.webviewReady) return;
       const text = e.document.getText();
       // The render always needs to fire — the document genuinely changed.
       if (entry.mode !== 'source') this.scheduleRender(entry);
@@ -308,12 +325,23 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       this.onDidChangeActiveModeEmitter.fire();
     });
 
-    // Hand over initial state. VS Code queues messages until the webview is
-    // ready, so this is safe even though Monaco hasn't loaded yet.
-    panel.webview.postMessage({
+    // Initial state is pushed from `case 'ready'` in handleWebviewMessage,
+    // not here. Sending it before the webview has wired its window-level
+    // `message` listener — which is the situation on cold VS Code launches
+    // when many things race — caused init/themeUpdate/renderedHtml to be
+    // lost, leaving the "Loading editor…" overlay stuck forever.
+
+    // Fire emitter so the status bar updates when the editor first resolves
+    // (the activate-on-open state change happens before the listener was
+    // registered, so we'd otherwise miss it).
+    this.onDidChangeActiveModeEmitter.fire();
+  }
+
+  private pushInitialState(entry: PanelEntry): void {
+    entry.panel.webview.postMessage({
       type: 'init',
-      text: document.getText(),
-      languageId: document.languageId || 'markdown',
+      text: entry.document.getText(),
+      languageId: entry.document.languageId || 'markdown',
       view: {
         mode: entry.mode,
         dividerH: entry.dividerH,
@@ -325,18 +353,19 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     });
     void this.pushThemeUpdate(entry);
     if (entry.mode !== 'source') void this.pushRender(entry);
-
-    // Fire emitter so the status bar updates when the editor first resolves
-    // (the activate-on-open state change happens before the listener was
-    // registered, so we'd otherwise miss it).
-    this.onDidChangeActiveModeEmitter.fire();
   }
 
   private async handleWebviewMessage(entry: PanelEntry, raw: unknown): Promise<void> {
     const msg = raw as { type?: string; [k: string]: unknown };
     switch (msg.type) {
       case 'ready':
-        // Webview finished loading Monaco.
+        // Webview has loaded Monaco and registered its message listener.
+        // Only now is it safe to push initial state — earlier postMessage
+        // calls can be lost on cold VS Code launches when the iframe's
+        // window listener isn't yet wired.
+        if (entry.webviewReady) break; // defensive against duplicate 'ready'
+        entry.webviewReady = true;
+        this.pushInitialState(entry);
         break;
       case 'edit': {
         const text = String(msg.text ?? '');
@@ -456,6 +485,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   }
 
   private async pushThemeUpdate(entry: PanelEntry): Promise<void> {
+    // Same reasoning as pushRender — pre-ready pushes race the message
+    // listener. The 'ready' handler invokes pushInitialState which calls
+    // this method, so deferred theme state is delivered at the right time.
+    if (!entry.webviewReady) return;
     const { themes } = this.resolveThemes(entry);
     const sourceUser = themes.source.theme;
     const previewUser = themes.preview.theme;
@@ -531,6 +564,10 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   }
 
   private async pushRender(entry: PanelEntry): Promise<void> {
+    // Pre-ready renders are wasted work — the webview hasn't wired its
+    // message listener yet, and the freshest text/themes will be carried
+    // by the init message anyway. The 'ready' handler re-invokes us.
+    if (!entry.webviewReady) return;
     let html: string;
     const settings = readRenderSettings();
     const { themes } = this.resolveThemes(entry);

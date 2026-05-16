@@ -16,7 +16,7 @@ declare const acquireVsCodeApi: () => {
 declare global {
   interface Window {
     require: {
-      (deps: string[], cb: () => void): void;
+      (deps: string[], cb: () => void, err?: (e: unknown) => void): void;
       config(opts: { paths: Record<string, string> }): void;
     };
     MonacoEnvironment: unknown;
@@ -356,7 +356,15 @@ function loadMonaco(): Promise<void> {
       return;
     }
     window.require.config({ paths: { vs: window.__MONACO_BASE_URL__ } });
-    window.require(['vs/editor/editor.main'], () => resolve());
+    // Pass an error callback to the AMD loader: without it, a failed module
+    // fetch leaves the success callback un-fired and the promise hangs
+    // forever. With it, AMD load failures reject and the outer bootstrap
+    // falls through to its catch path.
+    window.require(
+      ['vs/editor/editor.main'],
+      () => resolve(),
+      (e: unknown) => reject(e instanceof Error ? e : new Error(String(e))),
+    );
   });
 }
 
@@ -1290,11 +1298,29 @@ function handleMessage(msg: IncomingMessage): void {
 }
 
 async function bootstrap(): Promise<void> {
-  await loadMonaco();
+  try {
+    await loadMonaco();
+  } catch (e) {
+    // Monaco failed to load — overlay must come down so the user isn't
+    // staring at a stuck spinner forever. The editor pane will be empty
+    // (no source editing) but the rendered pane can still arrive once the
+    // extension pushes renderedHtml.
+    console.error('[sweet-markdown] Monaco load failed:', e);
+    hideLoadingOverlay();
+    return;
+  }
   monacoReady = true;
+  // Signal the extension that the webview is fully wired up. The extension
+  // defers init/themeUpdate/renderedHtml until this arrives — sending them
+  // before the webview's message listener is registered is exactly what
+  // caused the "Loading editor… forever" race on cold VS Code launches.
   vscode.postMessage({ type: 'ready' });
   while (messageQueue.length > 0) {
-    handleMessage(messageQueue.shift()!);
+    try {
+      handleMessage(messageQueue.shift()!);
+    } catch (err) {
+      console.error('[sweet-markdown] queued message handler failed:', err);
+    }
   }
 }
 
@@ -1304,7 +1330,12 @@ window.addEventListener('message', (e) => {
     messageQueue.push(msg);
     return;
   }
-  handleMessage(msg);
+  try {
+    handleMessage(msg);
+  } catch (err) {
+    console.error('[sweet-markdown] message handler failed:', err);
+    hideLoadingOverlay();
+  }
 });
 
 // VS Code mutates `body.classList` on theme change. Re-derive Monaco's theme.

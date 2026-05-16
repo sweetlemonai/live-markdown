@@ -2,6 +2,13 @@
 
 All notable changes to **Sweet Markdown** are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] — 2026-05-16
+
+### Fixed
+
+- **"Loading editor…" stuck forever on first open after a fresh VS Code launch.** `resolveCustomTextEditor` was posting `init` / `themeUpdate` / `renderedHtml` to the webview immediately after setting `webview.html` — before the webview's `window` message listener was wired up. On cold starts the webview iframe boots slowly enough that those messages could be dropped, leaving the spinner up indefinitely. The webview already sent a `'ready'` message after Monaco finished loading, but the extension's handler was empty. The handler now flips a per-panel `webviewReady` flag and pushes initial state at that point; `pushRender`, `pushThemeUpdate`, the doc-change listener, and the three `notify*` methods early-return until the flag is set. Reopening the file used to "fix" the issue only because the OS disk cache was warm; the race is now eliminated rather than masked.
+- **AMD loader hangs on Monaco load failure.** `window.require(['vs/editor/editor.main'], …)` was called without an error callback, so a failed module fetch left the success callback un-fired and the promise hung forever. The error callback now rejects, and the bootstrap catch path drops the loading overlay so the user isn't stuck staring at a spinner.
+
 ## [1.0.3] — 2026-05-07
 
 ### Changed
