@@ -440,11 +440,11 @@ function setupEditor(text: string, languageId: string): void {
   editor.addCommand(KM.CtrlCmd | KC.KeyE, () => runFormat('inlineCode'));
   editor.addCommand(KM.CtrlCmd | KC.KeyK, () => runFormat('link'));
 
-  // Cmd/Ctrl+V — image-aware paste. If clipboard is text, insert text;
-  // if clipboard has an image, send to the extension to be saved + linked.
-  editor.addCommand(KM.CtrlCmd | KC.KeyV, () => {
-    void handleClipboardPaste();
-  });
+  // Paste override is registered once globally in bootstrap via
+  // monaco.editor.registerCommand — see the comment there. The Cmd/Ctrl+V
+  // keybinding is already bound by Monaco to that command id, so a single
+  // registry-level override covers both the shortcut and the right-click
+  // → Paste context-menu entry without producing duplicate menu items.
 
   // Drag-and-drop: image files dropped onto Monaco container.
   monacoContainer.addEventListener('dragover', (e) => {
@@ -1309,6 +1309,18 @@ async function bootstrap(): Promise<void> {
     hideLoadingOverlay();
     return;
   }
+  // Override Monaco's built-in Paste. Monaco's default
+  // `editor.action.clipboardPasteAction` uses navigator.clipboard.readText,
+  // which fails silently in VS Code webviews because clipboard-read
+  // permission isn't granted to the iframe — the right-click → Paste
+  // menu entry appears to do nothing. Registering on the global
+  // CommandsRegistry (which Monaco resolves via "most-recent wins") sends
+  // *both* the Cmd/Ctrl+V keybinding and the context-menu entry through
+  // our image-aware handler, without adding a duplicate menu item.
+  window.monaco.editor.registerCommand(
+    'editor.action.clipboardPasteAction',
+    () => { void handleClipboardPaste(); },
+  );
   monacoReady = true;
   // Signal the extension that the webview is fully wired up. The extension
   // defers init/themeUpdate/renderedHtml until this arrives — sending them

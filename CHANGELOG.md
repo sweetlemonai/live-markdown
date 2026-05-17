@@ -2,6 +2,12 @@
 
 All notable changes to **Sweet Markdown** are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] — 2026-05-17
+
+### Fixed
+
+- **Right-click → Paste in the source pane did nothing.** Monaco's built-in `editor.action.clipboardPasteAction` reads the clipboard via `navigator.clipboard.readText`, which fails silently in VS Code webviews because clipboard-read permission isn't granted to the iframe. Cmd/Ctrl+V worked because the webview already had a per-editor override for that keybinding, but the context-menu entry still invoked the broken built-in. The override is now registered on Monaco's global `CommandsRegistry` for that command id, so both the keybinding and the menu entry route through the same image-aware paste handler — single menu entry, working from both paths.
+
 ## [1.1.0] — 2026-05-16
 
 ### Fixed

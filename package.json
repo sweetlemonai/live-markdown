@@ -2,7 +2,7 @@
   "name": "sweet-markdown",
   "displayName": "Sweet Markdown",
   "description": "Toggle individual markdown tabs between source and rendered preview, in place. Each tab is independent.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "sweet-lemon",
   "license": "MIT",
   "icon": "images/logo.png",
