@@ -2,6 +2,12 @@
 
 All notable changes to **Sweet Markdown** are documented here. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] — 2026-05-17
+
+### Fixed
+
+- **Cmd/Ctrl+V regressed in 1.1.1.** The 1.1.1 fix for right-click → Paste replaced the per-editor `editor.addCommand` keybinding with a global `monaco.editor.registerCommand` override, on the assumption that Monaco's keybinding for `editor.action.clipboardPasteAction` would resolve through `CommandsRegistry`. In practice the StandaloneEditor dispatches editor-action keybindings through a path that bypasses that override, so Cmd/Ctrl+V went back to Monaco's webview-broken built-in. Both routes are now wired: per-editor `addCommand` handles the keybinding, the global `registerCommand` handles the right-click menu entry, both hit the same image-aware paste handler.
+
 ## [1.1.1] — 2026-05-17
 
 ### Fixed

@@ -440,11 +440,16 @@ function setupEditor(text: string, languageId: string): void {
   editor.addCommand(KM.CtrlCmd | KC.KeyE, () => runFormat('inlineCode'));
   editor.addCommand(KM.CtrlCmd | KC.KeyK, () => runFormat('link'));
 
-  // Paste override is registered once globally in bootstrap via
-  // monaco.editor.registerCommand — see the comment there. The Cmd/Ctrl+V
-  // keybinding is already bound by Monaco to that command id, so a single
-  // registry-level override covers both the shortcut and the right-click
-  // → Paste context-menu entry without producing duplicate menu items.
+  // Cmd/Ctrl+V — image-aware paste. Registered as a per-editor keybinding
+  // (highest priority) because Monaco's StandaloneEditor dispatches its
+  // own editor-action keybindings through a path that bypasses our
+  // CommandsRegistry override below — relying on the global registration
+  // alone leaves Cmd/Ctrl+V hitting Monaco's broken built-in.
+  // The global override IS still needed for the right-click → Paste
+  // menu entry, which DOES go through CommandsRegistry.
+  editor.addCommand(KM.CtrlCmd | KC.KeyV, () => {
+    void handleClipboardPaste();
+  });
 
   // Drag-and-drop: image files dropped onto Monaco container.
   monacoContainer.addEventListener('dragover', (e) => {
